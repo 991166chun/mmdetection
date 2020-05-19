@@ -1,5 +1,5 @@
 '''
-
+000
 1. 修改 mmdetection/mmdet/core/evaluation 裡面 class_names.py 的 voc_classes
 
 2. 修改 mmdetection/mmdet/datasets/voc.py 裡的類別   [如果只有一類面要加逗號]) 
