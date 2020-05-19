@@ -14,8 +14,6 @@
 	       16    * 4         = 64              lr = 0.08
 	       1     * 2         = 2               lr = 0.0025
 
-
-
 python3 tools/train.py ${CONFIG_FILE} --work_dir ${YOUR_WORK_DIR} [optional arguments]
 
 # single-gpu testing

@@ -1,6 +1,7 @@
 _base_ = [
     '../_base_/models/cascade_rcnn_r50_fpn.py',
-    '../_base_/datasets/voc0712.py',
+    './my_coco.py',
+    './schedule_1x.py',
     '../_base_/default_runtime.py'
 ]
 model = dict(
@@ -11,7 +12,7 @@ model = dict(
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
-                num_classes=80,
+                num_classes=14,
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
@@ -28,7 +29,7 @@ model = dict(
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
-                num_classes=80,
+                num_classes=14,
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
@@ -45,7 +46,7 @@ model = dict(
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
-                num_classes=80,
+                num_classes=14,
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
@@ -57,11 +58,3 @@ model = dict(
                     loss_weight=1.0),
                 loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
         ]))
-# optimizer
-optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
-optimizer_config = dict(grad_clip=None)
-# learning policy
-# actual epoch = 3 * 3 = 9
-lr_config = dict(policy='step', step=[3])
-# runtime settings
-total_epochs = 4  # actual epoch = 4 * 3 = 12
