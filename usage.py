@@ -6,7 +6,7 @@
 
 3. 修改 config.py
 	
-	3.1 num_classes 要改
+	3.1 num_classes 要改 (不用另外+1了，直接輸入要train的數量)
  
 	3.2  config.py  裡 dataset_type, dataroot, ann_file, img_prefix
 
@@ -14,13 +14,20 @@
 	       16    * 4         = 64              lr = 0.08
 	       1     * 2         = 2               lr = 0.0025
 
+	3.3 gradient clip (避免loss爆炸，可加可不加)
+
+	optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
+
+	3.4 ****重要**** 有直的圖片cv2會讀成直的 要加UNCHANGE參數
+
+	dict(type='LoadImageFromFile', color_type='unchanged')
+
+
+
 python3 tools/train.py ${CONFIG_FILE} --work_dir ${YOUR_WORK_DIR} [optional arguments]
 
 # single-gpu testing
 python3 tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [--out ${RESULT_FILE}] [--eval ${EVAL_METRICS}] [--show]
-
-
-
 
 # Plot the classification and regression loss of some run, and save the figure to a pdf.
 python3 tools/analyze_logs.py plot_curve log.json --title ${TITLE} --keys loss_cls loss_reg --legend loss_cls loss_reg --out losses.pdf
