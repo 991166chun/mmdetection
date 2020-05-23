@@ -16,11 +16,11 @@
 
 	3.3 gradient clip (避免loss爆炸，可加可不加)
 
-	optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
+			optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 
 	3.4 ****重要**** 有直的圖片cv2會讀成直的 要加UNCHANGE參數
 
-	dict(type='LoadImageFromFile', color_type='unchanged')
+			dict(type='LoadImageFromFile', color_type='unchanged')
 
 
 
