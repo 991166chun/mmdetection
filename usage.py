@@ -22,6 +22,14 @@
 
 			dict(type='LoadImageFromFile', color_type='unchanged')
 
+	3.5 learning rate 
+		total = 12
+		lr_config = dict(	policy='step',
+											warmup='linear',
+											warmup_iters=500,
+											warmup_ratio=0.001,
+											step=[8, 11],
+											gamma=0.1)
 
 
 python3 tools/train.py ${CONFIG_FILE} --work_dir ${YOUR_WORK_DIR} [optional arguments]

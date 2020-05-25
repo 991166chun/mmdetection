@@ -8,6 +8,7 @@ import torch.nn as nn
 from mmcv.utils import print_log
 
 from mmdet.core import auto_fp16
+from mmdet.xm_utils import imshow_det_bboxes
 
 
 class BaseDetector(nn.Module, metaclass=ABCMeta):
@@ -184,7 +185,7 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
         Returns:
             img (Tensor): Only if not `show` or `out_file`
         """
-        img = mmcv.imread(img)
+        img = mmcv.imread(img, flag='unchanged')
         img = img.copy()
         if isinstance(result, tuple):
             bbox_result, segm_result = result
@@ -216,7 +217,7 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
         if out_file is not None:
             show = False
         # draw bounding boxes
-        mmcv.imshow_det_bboxes(
+        imshow_det_bboxes(
             img,
             bboxes,
             labels,

@@ -5,10 +5,14 @@ _base_ = [
 ]
 model = dict(roi_head=dict(bbox_head=dict(num_classes=13)))
 # optimizer
-optimizer = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001)
+optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35))
 # learning policy
-# actual epoch = 3 * 3 = 9
-lr_config = dict(policy='step', step=[3])
+# actual epoch = 
+lr_config = dict(policy='step',
+                warmup='linear',
+                warmup_iters=500,
+                warmup_ratio=0.001,
+                step=[3, 6], gamma=0.2)
 # runtime settings
-total_epochs = 20  # actual epoch = 4 * 3 = 12
+total_epochs = 10  # actual epoch = 10 * 2 = 14
