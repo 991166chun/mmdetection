@@ -1,0 +1,1 @@
+CUDA_VISIBLE_DEVICES=0 python3 -u tools/test.py configs/_xm/cascade_res50_fpn.py  work_dirs/cascade_res50_fpn/crcnn_101x_final.pth --show-dir output/Cascade
