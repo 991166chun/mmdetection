@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 from mmdet.core import bbox_overlaps
-from ..buider import LOSSES
+from ..builder import LOSSES
 from .utils import weighted_loss
 
 @weighted_loss
@@ -30,7 +30,7 @@ def diou_loss(pred, target, eps=1e-6):
 class DIoULoss(nn.Module):
 
   def __init__(self, eps=1e-6, reduction='mean', loss_weight=1.0):
-    super(dIoULoss, self).__init__()
+    super(DIoULoss, self).__init__()
     self.eps = eps
     self.reduction = reduction
     self.loss_weight = loss_weight
