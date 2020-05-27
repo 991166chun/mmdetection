@@ -20,11 +20,44 @@ def diou_loss(pred, target, eps=1e-6):
     Return:
         Tensor: Loss tensor.
   """
-  ious = bbox_overlaps(pred, target, is_aligned=True).clamp(min=eps)
+  #  center point
+  x_p = (pred[:, 2] + pred[:, 0]) / 2
+  y_p = (pred[:, 3] + pred[:, 1]) / 2
+  x_g = (target[:, 2] + target[:, 0]) / 2
+  y_g = (target[:, 3] + target[:, 1]) / 2
 
-  loss = -ious.log()
+
+  # overlap
+  i_x1y1 = torch.max(pred[:, :2], target[:, :2])
+  i_x2y2 = torch.min(pred[:, 2:], target[:, 2:])
+  i_wh = (i_x2y2 - i_x1y1).clamp(min=0)
+  overlap = i_wh[:, 0] * i_wh[:, 1]
+
+  # union
+  ap = (pred[:, 2] - pred[:, 0]) * (pred[:, 3] - pred[:, 1])
+  ag = (target[:, 2] - target[:, 0]) * (target[:, 3] - target[:, 1])
+  union = ap + ag - overlap + eps
+
+  # IoU
+  ious = overlap / union
+
+  # enclose box each (n, 2)
+  c_x1y1 = torch.min(pred[:, :2], target[:, :2])
+  c_x2y2 = torch.max(pred[:, 2:], target[:, 2:])
+  
+  # diagonal length ^2 of enclose box
+  c = ((c_x2y2[:, 0] - c_x1y1[:, 0]) ** 2) + ((c_x2y2[:, 1] - c_x1y1[:, 1]) ** 2) +1e-7
+
+  # center distance ^2
+  d = ((x_p - x_g) ** 2) + ((y_p - y_g) ** 2)
+
+  # u = d / c
+  r = d / c
+
+  loss = 1 - ious + r
+  
   return loss
-
+  
 
 @LOSSES.register_module()
 class DIoULoss(nn.Module):
