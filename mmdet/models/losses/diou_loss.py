@@ -46,7 +46,7 @@ def diou_loss(pred, target, eps=1e-6):
   c_x2y2 = torch.max(pred[:, 2:], target[:, 2:])
   
   # diagonal length ^2 of enclose box
-  c = ((c_x2y2[:, 0] - c_x1y1[:, 0]) ** 2) + ((c_x2y2[:, 1] - c_x1y1[:, 1]) ** 2) +1e-7
+  c = ((c_x2y2[:, 0] - c_x1y1[:, 0]) ** 2) + ((c_x2y2[:, 1] - c_x1y1[:, 1]) ** 2) + eps
 
   # center distance ^2
   d = ((x_p - x_g) ** 2) + ((y_p - y_g) ** 2)
@@ -55,7 +55,7 @@ def diou_loss(pred, target, eps=1e-6):
   r = d / c
 
   loss = 1 - ious + r
-  
+
   return loss
   
 
