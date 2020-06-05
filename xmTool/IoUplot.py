@@ -13,8 +13,11 @@ from cycler import cycler
 
 
 def get_iou(pr,gt):
-    
-    pr = t.FloatTensor(pr)[:,1:]
+    if pr.shape[1] == 5:
+        pr = t.FloatTensor(pr)[:,1:]
+    else:
+        pr = t.FloatTensor(pr)
+
     gt = t.FloatTensor(gt)[:,1:]
     ious = bbox_overlaps(pr,gt)
     v, idx = t.max(ious, dim=1)
@@ -222,7 +225,7 @@ def draw(tag, stack_data):
 
 if __name__ == '__main__':
 
-    boxfile = 'xmTool/giou_prp.pkl'
+    boxfile = 'xmTool/diou_prp.pkl'
 
     with open(boxfile, 'rb') as f:
         boxdict =pkl.load(f)
@@ -232,10 +235,11 @@ if __name__ == '__main__':
     with open(gtfile, 'rb') as f1:
         gtdict =pkl.load(f1)
 
-    tag1 = ['rpn', 'stage3']
+    tag1 = ['rpn', 'diou']
 
     pr = boxdict[tag1[0]]
     pr2 = boxdict[tag1[1]]
+    
     gt = gtdict['test']
     
     count = t.tensor([])

@@ -13,6 +13,6 @@ lr_config = dict(policy='step',
                 warmup='linear',
                 warmup_iters=500,
                 warmup_ratio=0.001,
-                step=[3, 6], gamma=0.2)
-# runtime settings
-total_epochs = 10  # actual epoch = 10 * 2 = 14
+                step=[5, 8, 10], gamma=0.2)
+# runtime settings  0.01  0.002 0.0004  0.00008
+total_epochs = 12  # actual epoch = 12 * 2 = 24

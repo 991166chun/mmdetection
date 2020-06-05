@@ -3,10 +3,5 @@ model = dict(
     roi_head=dict(
         bbox_head=dict(
             reg_decoded_bbox=True,
-            loss_bbox=dict(type='DIoULoss', loss_weight=2.0))))
-log_config = dict(
-    interval=1,
-    hooks=[
-        dict(type='TextLoggerHook'),
-        # dict(type='TensorboardLoggerHook')
-    ])
+            loss_bbox=dict(type='DIoULoss', loss_weight=3.0))))
+
