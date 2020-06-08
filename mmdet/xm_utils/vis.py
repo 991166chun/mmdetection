@@ -3,26 +3,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mmcv.image import  imwrite
 
-color = [   
-            [0, 0.5, 0],
-            [0.5, 0.5, 0],
-            [0, 0, 0.5],
-            [0.5, 0, 0.5],
-            [0, 0.5, 0.58],
-            [0.5, 0.5, 0.5],
-            [0.25, 0, 0],
-            [0.75, 0, 0],
-            [0.25, 0.5, 0],
-            [0.75, 0.5, 0],
-            [0.25, 0, 0.5],
-            [0.75, 0, 0.5],
-            [0.25, 0.5, 0.5],
-            [0.75, 0.5, 0.5],
-            [0, 0.25, 0],
-            [0.5, 0.25, 0],
-            [0, 0.75, 0],
-            [0.5, 0.75, 0],
-            [0, 0.25, 0.5]]
+color = {   
+            'brownblight':[0.75, 0.25, 0],
+            'blister':[0.5, 0.5, 0],
+            'algal':[0, 0, 0.5],
+            'fungi_early':[0.5, 0, 0.5],
+            'miner':[0, 0.5, 0.58],
+            'thrips':[0.5, 0.5, 0.5],
+            'mosquito_early':[0.75, 0, 0],
+            'mosquito_late':[0.25, 0, 0],
+            'moth':[0.25, 0.5, 0],
+            'tortrix':[0.75, 0.5, 0],
+            'flushworm':[0.25, 0, 0.5],
+            'roller':[0.75, 0, 0.5],
+            'other':[0.25, 0.5, 0.5],
+
+            'cls 0':[0.75, 0.5, 0.5],
+            'cls 1':[0, 0.25, 0],
+            'cls 2':[0.5, 0.25, 0],
+            'cls 3':[0, 0.75, 0],
+            'cls 4':[0.5, 0.75, 0],
+            'cls 5':[0, 0.25, 0.5]
+            }
+ignoer_list = ['other',]
 
 def imshow_det_bboxes(img,
                       bboxes,
@@ -83,7 +86,9 @@ def imshow_det_bboxes(img,
     ax.imshow(img[:, :, ::-1])
 
     for bbox, label in zip(bboxes, labels):
-        
+        name = class_names[label]
+        if name in ignoer_list:
+            continue            
         bbox_int = bbox.astype(np.int32)
         left_top = (bbox_int[0], bbox_int[1])
         right_bottom = (bbox_int[2], bbox_int[3])
@@ -92,7 +97,7 @@ def imshow_det_bboxes(img,
                           right_bottom[0] - left_top[0],
                           right_bottom[1] - left_top[1],
                           fill=False,
-                          edgecolor=tuple(color[label]),
+                          edgecolor=tuple(color[name]),
                           linewidth=lw, alpha=0.7))
         label_text = class_names[
             label] if class_names is not None else f'cls {label}'
@@ -104,7 +109,7 @@ def imshow_det_bboxes(img,
                 fontsize=fs,
                 family='serif',
                 bbox=dict(
-                    facecolor=tuple(color[label]),
+                    facecolor=tuple(color[name]),
                     alpha=0.6, pad=0, edgecolor='none'),
                 color='white')
 
