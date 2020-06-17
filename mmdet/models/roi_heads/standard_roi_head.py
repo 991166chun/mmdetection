@@ -241,17 +241,45 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         """Test without augmentation."""
         assert self.with_bbox, 'Bbox head must be implemented.'
 
-        det_bboxes, det_labels = self.simple_test_bboxes(
-            x, img_metas, proposal_list, self.test_cfg, rescale=rescale)
+        # det_bboxes, det_labels, ms_bbox_result = self.test_bboxes_withRoI(
+        #     x, img_metas, proposal_list, self.test_cfg, rescale=rescale)
+
+        img_shape = img_metas[0]['img_shape']
+        ori_shape = img_metas[0]['ori_shape']
+        scale_factor = img_metas[0]['scale_factor']
+
+        ms_bbox_result = {}
+        ms_bbox_result['img_meta'] = (img_shape, ori_shape, scale_factor)
+
+        rois = bbox2roi(proposal_list)
+        ms_bbox_result['rpn'] = rois.cpu().numpy()
+
+        bbox_results = self._bbox_forward(x, rois)    
+
+        bbox_label = bbox_results['cls_score'].argmax(dim=1)
+        # print(rois)
+        # print(bbox_label, bbox_label.size())
+        # print(bbox_results['bbox_pred'].size())
+        rois2 = self.bbox_head.regress_by_class(
+                    rois, bbox_label, bbox_results['bbox_pred'], img_metas[0])
+        ms_bbox_result['reg'] = rois2.cpu().numpy()
+
+        det_bboxes, det_labels = self.bbox_head.get_bboxes(
+            rois,
+            bbox_results['cls_score'],
+            bbox_results['bbox_pred'],
+            img_shape,
+            scale_factor,
+            rescale=rescale,
+            cfg=self.test_cfg)
+
+        
         bbox_results = bbox2result(det_bboxes, det_labels,
                                    self.bbox_head.num_classes)
-
-        if not self.with_mask:
-            return bbox_results
-        else:
-            segm_results = self.simple_test_mask(
-                x, img_metas, det_bboxes, det_labels, rescale=rescale)
-            return bbox_results, segm_results
+        ms_bbox_result['ensemble'] = bbox_results
+        
+        return ms_bbox_result
+        
 
     def aug_test(self, x, proposal_list, img_metas, rescale=False):
         """Test with augmentations.

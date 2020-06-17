@@ -316,13 +316,15 @@ class BBoxHead(nn.Module):
             Tensor: Regressed bboxes, the same shape as input rois.
         """
         assert rois.size(1) == 4 or rois.size(1) == 5, repr(rois.shape)
-
+        # 
         if not self.reg_class_agnostic:
+            # label = label-1
             label = label * 4
             inds = torch.stack((label, label + 1, label + 2, label + 3), 1)
+            bbox_pred_bg = torch.zeros(bbox_pred.size(0),4).to(torch.device('cuda:0'))
+            bbox_pred = torch.cat((bbox_pred_bg, bbox_pred), 1)
             bbox_pred = torch.gather(bbox_pred, 1, inds)
         assert bbox_pred.size(1) == 4
-
         if rois.size(1) == 4:
             new_rois = self.bbox_coder.decode(
                 rois, bbox_pred, max_shape=img_meta['img_shape'])
