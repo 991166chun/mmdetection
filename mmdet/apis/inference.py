@@ -129,6 +129,44 @@ async def async_inference_detector(model, img):
     result = await model.aforward_test(rescale=True, **data)
     return result
 
+def prepare_data(model, img):
+    """Inference image(s) with the detector.
+
+    Args:
+        model (nn.Module): The loaded detector.
+        imgs (str/ndarray or list[str/ndarray]): Either image files or loaded
+            images.
+
+    Returns:
+        If imgs is a str, a generator will be returned, otherwise return the
+        detection results directly.
+    """
+    cfg = model.cfg
+    device = next(model.parameters()).device  # model device
+    # build the data pipeline
+    test_pipeline = [LoadImage()] + cfg.data.test.pipeline[1:]
+    test_pipeline = Compose(test_pipeline)
+    # prepare data
+    data = dict(img=img)
+    data = test_pipeline(data)
+    data = collate([data], samples_per_gpu=1)
+    if next(model.parameters()).is_cuda:
+        # scatter to specified GPU
+        data = scatter(data, [device])[0]
+    else:
+        # Use torchvision ops for CPU mode instead
+        for m in model.modules():
+            if isinstance(m, (RoIPool, RoIAlign)):
+                if not m.aligned:
+                    # aligned=False is not implemented on CPU
+                    # set use_torchvision on-the-fly
+                    m.use_torchvision = True
+        warnings.warn('We set use_torchvision=True in CPU mode.')
+        # just get the actual data from DataContainer
+        data['img_metas'] = data['img_metas'][0].data
+    return data
+    
+
 
 def show_result_pyplot(model, img, result, score_thr=0.3, fig_size=(15, 10)):
     """Visualize the detection results on the image.

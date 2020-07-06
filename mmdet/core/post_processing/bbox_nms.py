@@ -34,24 +34,31 @@ def multiclass_nms(multi_bboxes,
     else:
         bboxes = multi_bboxes[:, None].expand(-1, num_classes, 4)
     scores = multi_scores[:, :-1]
-
+    
+    indices = torch.arange(start=0, end=scores.size(0), dtype=int)
+    indices = indices.expand((scores.size(1), scores.size(0))).T
+    
     # filter out boxes with low scores
     valid_mask = scores > score_thr
     bboxes = bboxes[valid_mask]
+    indices = indices[valid_mask]
+
     if score_factors is not None:
         scores = scores * score_factors[:, None]
     scores = scores[valid_mask]
     labels = valid_mask.nonzero()[:, 1]
 
-    if bboxes.numel() == 0:
+    if bboxes.numel() == 0:    # num of elements
         bboxes = multi_bboxes.new_zeros((0, 5))
         labels = multi_bboxes.new_zeros((0, ), dtype=torch.long)
         return bboxes, labels
 
     dets, keep = batched_nms(bboxes, scores, labels, nms_cfg)
-
+    indices = indices[keep]
     if max_num > 0:
         dets = dets[:max_num]
         keep = keep[:max_num]
+    
+    # return dets, labels[keep]
 
-    return dets, labels[keep]
+    return dets, dict(label=labels[keep], ind=indices)

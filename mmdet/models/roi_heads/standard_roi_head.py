@@ -241,8 +241,22 @@ class StandardRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         """Test without augmentation."""
         assert self.with_bbox, 'Bbox head must be implemented.'
 
-        det_bboxes, det_labels = self.simple_test_bboxes(
-            x, img_metas, proposal_list, self.test_cfg, rescale=rescale)
+        # det_bboxes, det_labels = self.simple_test_bboxes(
+        #     x, img_metas, proposal_list, self.test_cfg, rescale=rescale)
+        
+        rois = bbox2roi(proposal_list)
+        bbox_results = self._bbox_forward(x, rois)
+        img_shape = img_metas[0]['img_shape']
+        scale_factor = img_metas[0]['scale_factor']
+        det_bboxes, det_labels = self.bbox_head.get_bboxes(
+            rois,
+            bbox_results['cls_score'],
+            bbox_results['bbox_pred'],
+            img_shape,
+            scale_factor,
+            rescale=rescale,
+            cfg=self.test_cfg)
+        
         bbox_results = bbox2result(det_bboxes, det_labels,
                                    self.bbox_head.num_classes)
 

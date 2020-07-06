@@ -3,7 +3,18 @@ _base_ = [
     './my_voc.py',
     './my_runtime.py'
 ]
-model = dict(roi_head=dict(bbox_head=dict(num_classes=13)))
+model = dict(
+    backbone=dict(
+        type='ResNet',
+        depth=50,
+        num_stages=4,
+        out_indices=(0, 1, 2, 3),
+        frozen_stages=-1,
+        norm_cfg=dict(type='BN', requires_grad=True),
+        norm_eval=True,
+        style='pytorch'),
+    roi_head=dict(bbox_head=dict(num_classes=13))
+    )
 # optimizer
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35))
