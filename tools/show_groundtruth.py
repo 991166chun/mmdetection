@@ -52,7 +52,7 @@ def main():
     gts = []
     print(dataset.CLASSES)
     for item in dataset:
-        # print(len(item['gt_labels']))
+        print(item.keys())
         gt_box = item['gt_bboxes'][0]
         gt_label = item['gt_labels'][0]
         gt_label = np.reshape(gt_label, ( gt_label.shape[0],1))

@@ -117,5 +117,8 @@ work_dirs/
 
 # Pytorch
 *.pth
-*.py~
-*.sh~
+*.jpg
+*.png
+
+
+

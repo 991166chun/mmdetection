@@ -3,6 +3,7 @@ import os
 
 import mmcv
 import torch
+import pickle
 from mmcv import Config, DictAction
 from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
 from mmcv.runner import get_dist_info, init_dist, load_checkpoint
@@ -38,6 +39,7 @@ def parse_args():
         help='evaluation metrics, which depends on the dataset, e.g., "bbox",'
         ' "segm", "proposal" for COCO, and "mAP", "recall" for PASCAL VOC')
     parser.add_argument('--show', action='store_true', help='show results')
+    parser.add_argument('--get_roi', default=False, action='store_true', help='store roi to pkl')
     parser.add_argument(
         '--show-dir', help='directory where painted images will be saved')
     parser.add_argument(
@@ -132,7 +134,21 @@ def main():
             broadcast_buffers=False)
         outputs = multi_gpu_test(model, data_loader, args.tmpdir,
                                  args.gpu_collect)
+    if args.get_roi:
+        rpn = [op['rpn'] for op in outputs]
+        stage1 = [op['reg'] for op in outputs]
+        ms_box = {
+                        'rpn':rpn,
+                        'reg':stage1,
+                        # 'stage2':stage2,
+                        # 'stage3':stage3,
+                        }
+        file = open('xmTool/diou.pkl', 'wb')
+        pickle.dump(ms_box, file)
+        file.close()
+    outputs = [op['ensemble'] for op in outputs]
 
+    
     rank, _ = get_dist_info()
     if rank == 0:
         if args.out:
