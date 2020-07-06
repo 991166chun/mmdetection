@@ -3,7 +3,11 @@ _base_ = [
     './my_voc.py',
     './my_runtime.py'
 ]
-model = dict(roi_head=dict(bbox_head=dict(num_classes=13)))
+model = dict(
+    roi_head=dict(
+        bbox_head=dict(
+            num_classes=12,
+            reg_class_agnostic=True)))
 # optimizer
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35))

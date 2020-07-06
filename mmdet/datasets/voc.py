@@ -10,7 +10,7 @@ class VOCDataset(XMLDataset):
                  'miner',   'thrips',
                  'mosquito_early', 'mosquito_late',
                  'moth', 'tortrix',   'flushworm',
-                 'roller',   'other')
+                 'roller')
 
     def __init__(self, **kwargs):
         super(VOCDataset, self).__init__(**kwargs)
