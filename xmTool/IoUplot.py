@@ -225,7 +225,7 @@ def draw(tag, stack_data):
 
 if __name__ == '__main__':
 
-    boxfile = 'xmTool/diou_prp.pkl'
+    boxfile = 'xmTool/frcnn.pkl'
 
     with open(boxfile, 'rb') as f:
         boxdict =pkl.load(f)
@@ -235,7 +235,7 @@ if __name__ == '__main__':
     with open(gtfile, 'rb') as f1:
         gtdict =pkl.load(f1)
 
-    tag1 = ['rpn', 'diou']
+    tag1 = ['rpn', 'reg']
 
     pr = boxdict[tag1[0]]
     pr2 = boxdict[tag1[1]]

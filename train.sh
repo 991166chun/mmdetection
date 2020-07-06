@@ -1,1 +1,1 @@
-CUDA_VISIBLE_DEVICES=1 python3 -u tools/train.py configs/_xm/faster_res50_fpn_voc.py
+CUDA_VISIBLE_DEVICES=0 python3 -u tools/train.py configs/_xm/cascade_res50_fpn.py
