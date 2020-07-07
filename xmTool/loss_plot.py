@@ -5,7 +5,10 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+'''
+usage : python3 xmTool/loss_plot.py plot_curve work_dirs/cascade_res50_fpn/20200527_230629.log.json --keys loss mAP --legend loss mAP --out loss.png
 
+'''
 
 def cal_train_time(log_dicts, args):
     for i, log_dict in enumerate(log_dicts):
@@ -61,10 +64,9 @@ def plot_curve(log_dicts, args):
                     ys += log_dict[epoch][metric]
                 ax = plt.gca()
                 ax2 = ax.twinx()
-                ax2.set_xticks(xs)
-                ax2.tick_params(axis='y', labelcolor='tab:blue')
-                ax2.set_ylabel('eval mAP',rotation='horizontal')
-                ax2.yaxis.set_label_coords(1.05, -0.07)
+                ax2.tick_params(axis='y', labelcolor='tab:blue', labelsize=14)
+                ax2.set_ylabel('eval mAP', rotation=-90, fontsize=16)
+                ax2.yaxis.set_label_coords(1.15, 0.55)
                 ax2.set_ylim([0,1])
                 plt.plot(xs, ys, label=legend[i * num_metrics + j], linewidth=1, marker='*')
                 # --------------------------------------
@@ -76,10 +78,11 @@ def plot_curve(log_dicts, args):
                     avg_loss = np.mean(loss_ep)
                     ys.append(avg_loss)
                 ax = plt.gca()
-                plt.xlabel('epoch')
-                ax.tick_params(axis='y', labelcolor='tab:orange')
-                ax.set_ylabel('training loss',rotation='horizontal')
-                ax.yaxis.set_label_coords(-0.05, -0.11)
+                plt.xlabel('epoch', fontsize=14)
+                ax.set_xticks(xs)
+                ax.tick_params(axis='x', labelsize=14)
+                ax.tick_params(axis='y', labelcolor='tab:orange', labelsize=14)
+                ax.set_ylabel('training loss', fontsize=16)
                 ax.set_ylim([0,1.2])
                 plt.plot(xs, ys, label=legend[i * num_metrics + j], linewidth=1, marker='x', color='orange')
                 # ---------------------------------------
@@ -99,7 +102,7 @@ def plot_curve(log_dicts, args):
                 plt.xlabel('iter')
                 plt.plot(
                     xs, ys, label=legend[i * num_metrics + j], linewidth=1)
-            plt.legend()
+            # plt.legend()
             plt.tight_layout()
         if args.title is not None:
             plt.title('tra')
