@@ -283,23 +283,15 @@ class CascadeRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         rcnn_test_cfg = self.test_cfg
 
         rois = bbox2roi(proposal_list)
-        ms_bbox_result['img_meta'] = (img_shape, ori_shape, scale_factor)
-        ms_bbox_result['rpn'] = rois.cpu().numpy()
-        
         for i in range(self.num_stages):
             bbox_results = self._bbox_forward(i, x, rois)
             ms_scores.append(bbox_results['cls_score'])
 
-            if i < self.num_stages :
-                stage = 'stage%d' %(i+1)
+            if i < self.num_stages - 1:
                 bbox_label = bbox_results['cls_score'].argmax(dim=1)
                 rois = self.bbox_head[i].regress_by_class(
                     rois, bbox_label, bbox_results['bbox_pred'], img_metas[0])
-                ms_bbox_result[stage] = rois.cpu().numpy()
 
-        # rois = self.bbox_head[2].regress_by_class(
-        #             rois, bbox_label, bbox_results['bbox_pred'], img_metas[0])
-        # ms_bbox_result['stage3'] = rois.cpu().numpy()
         cls_score = sum(ms_scores) / self.num_stages
         det_bboxes, det_labels = self.bbox_head[-1].get_bboxes(
             rois,
@@ -309,7 +301,6 @@ class CascadeRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
             scale_factor,
             rescale=rescale,
             cfg=rcnn_test_cfg)
-        
         bbox_result = bbox2result(det_bboxes, det_labels,
                                   self.bbox_head[-1].num_classes)
         ms_bbox_result['ensemble'] = bbox_result
@@ -342,7 +333,7 @@ class CascadeRoIHead(BaseRoIHead, BBoxTestMixin, MaskTestMixin):
         else:
             results = ms_bbox_result['ensemble']
 
-        return ms_bbox_result
+        return results
 
     def aug_test(self, features, proposal_list, img_metas, rescale=False):
         """Test with augmentations.

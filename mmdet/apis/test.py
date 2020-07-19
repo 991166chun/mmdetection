@@ -4,34 +4,11 @@ import shutil
 import tempfile
 
 import mmcv
-import numpy as np
-import pycocotools.mask as mask_util
 import torch
 import torch.distributed as dist
 from mmcv.runner import get_dist_info
 
 from mmdet.core import tensor2imgs
-
-
-# TODO: move this function to more proper place
-def encode_mask_results(mask_results):
-    if isinstance(mask_results, tuple):  # mask scoring
-        cls_segms, cls_mask_scores = mask_results
-    else:
-        cls_segms = mask_results
-    num_classes = len(cls_segms)
-    encoded_mask_results = [[] for _ in range(num_classes)]
-    for i in range(len(cls_segms)):
-        for cls_segm in cls_segms[i]:
-            encoded_mask_results[i].append(
-                mask_util.encode(
-                    np.array(
-                        cls_segm[:, :, np.newaxis], order='F',
-                        dtype='uint8'))[0])  # encoded with RLE
-    if isinstance(mask_results, tuple):
-        return encoded_mask_results, cls_mask_scores
-    else:
-        return encoded_mask_results
 
 
 def single_gpu_test(model,
@@ -46,11 +23,6 @@ def single_gpu_test(model,
     for i, data in enumerate(data_loader):
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)
-            # encode mask results
-            if isinstance(result, tuple):
-                bbox_results, mask_results = result
-                encoded_mask_results = encode_mask_results(mask_results)
-                result = bbox_results, encoded_mask_results
         results.append(result)
 
         if show or out_dir:
@@ -67,11 +39,10 @@ def single_gpu_test(model,
                 img_show = mmcv.imresize(img_show, (ori_w, ori_h))
 
                 if out_dir:
-                    img_name = osp.basename(img_meta['filename'])
-                    out_file = osp.join(out_dir, img_name)
+                    out_file = osp.join(out_dir, img_meta['filename'])
                 else:
                     out_file = None
-                    
+
                 model.module.show_result(
                     img_show,
                     result,
@@ -113,11 +84,6 @@ def multi_gpu_test(model, data_loader, tmpdir=None, gpu_collect=False):
     for i, data in enumerate(data_loader):
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)
-            # encode mask results
-            if isinstance(result, tuple):
-                bbox_results, mask_results = result
-                encoded_mask_results = encode_mask_results(mask_results)
-                result = bbox_results, encoded_mask_results
         results.append(result)
 
         if rank == 0:
