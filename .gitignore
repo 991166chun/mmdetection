@@ -114,6 +114,9 @@ mmdet/version.py
 *.pkl.json
 *.log.json
 work_dirs/
+*.png
+*.jpg
+nohup.out
 
 # Pytorch
 *.pth
