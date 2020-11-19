@@ -117,7 +117,7 @@ work_dirs/
 *.png
 *.jpg
 nohup.out
-
+xmTool/Grad-CAM.pytorch/*
 # Pytorch
 *.pth
 *.py~
