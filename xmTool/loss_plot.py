@@ -5,6 +5,7 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+import matplotlib.ticker as ticker
 '''
 usage : python3 xmTool/loss_plot.py plot_curve work_dirs/cascade_res50_fpn/20200527_230629.log.json --keys loss mAP --legend loss mAP --out loss.png
 
@@ -66,7 +67,7 @@ def plot_curve(log_dicts, args):
                 ax2 = ax.twinx()
                 ax2.tick_params(axis='y', labelcolor='tab:blue', labelsize=14)
                 ax2.set_ylabel('eval mAP', rotation=-90, fontsize=16)
-                ax2.yaxis.set_label_coords(1.15, 0.55)
+                ax2.yaxis.set_label_coords(1.15, 0.53)
                 ax2.set_ylim([0,1])
                 plt.plot(xs, ys, label=legend[i * num_metrics + j], linewidth=1, marker='*')
                 # --------------------------------------
@@ -78,12 +79,13 @@ def plot_curve(log_dicts, args):
                     avg_loss = np.mean(loss_ep)
                     ys.append(avg_loss)
                 ax = plt.gca()
-                plt.xlabel('epoch', fontsize=14)
+                plt.xlabel('epoch', fontsize=16)
                 ax.set_xticks(xs)
                 ax.tick_params(axis='x', labelsize=14)
+                ax.xaxis.set_major_locator(ticker.MultipleLocator(2))
                 ax.tick_params(axis='y', labelcolor='tab:orange', labelsize=14)
                 ax.set_ylabel('training loss', fontsize=16)
-                ax.set_ylim([0,1.2])
+                ax.set_ylim([0,0.8])
                 plt.plot(xs, ys, label=legend[i * num_metrics + j], linewidth=1, marker='x', color='orange')
                 # ---------------------------------------
             else:

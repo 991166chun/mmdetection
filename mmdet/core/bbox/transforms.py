@@ -69,6 +69,24 @@ def roi2bbox(rois):
         bbox_list.append(bbox)
     return bbox_list
 
+def bbox2result_ori(bboxes, labels, num_classes):
+    """Convert detection results to a list of numpy arrays.
+
+    Args:
+        bboxes (Tensor): shape (n, 5)
+        labels (Tensor): shape (n, )
+        num_classes (int): class number, including background class
+
+    Returns:
+        list(ndarray): bbox results of each class
+    """
+    if bboxes.shape[0] == 0:
+        return [np.zeros((0, 5), dtype=np.float32) for i in range(num_classes)]
+    else:
+        bboxes = bboxes.cpu().numpy()
+        labels = labels.cpu().numpy()
+        return [bboxes[labels == i, :] for i in range(num_classes)]
+
 
 def bbox2result(bboxes, labels, num_classes):
     """Convert detection results to a list of numpy arrays.

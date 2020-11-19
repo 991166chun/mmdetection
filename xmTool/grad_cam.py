@@ -61,6 +61,7 @@ class GradCAM(object):
         output = self.net.simple_test(data['img'][0], data['img_metas'][0] )
         
         for i, out in enumerate(output):
+            print(out)
             score = out['score']
             label = out['label']
             print(score, label, i)    
@@ -69,6 +70,8 @@ class GradCAM(object):
         box = output[index]['bbox']
         proposal_idx = output[index]['ind']
         label = output[index]['label']
+
+
         score.backward()
         
         if self.gradient == None:
@@ -92,8 +95,12 @@ class GradCAM(object):
         box = box.detach().numpy().astype(np.int32)
         x1, y1, x2, y2 = box
         cam = cv2.resize(cam, imsize)
-        
+        # crop_cam = cam[y1:y2, x1:x2]
+
         class_id = label.detach().numpy()
+        pre_scr = "{:.3f}".format(score.detach().numpy())
+        label = self.net.CLASSES[int(class_id)]
+        self.cam_info.append(f"label: {label}, score: {pre_scr}, box: {x1}, {y1}, {x2}, {y2}")
 
         return cam, box, class_id, self.cam_info
 
