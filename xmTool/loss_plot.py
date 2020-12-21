@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-
+COLOR = ['orange', 'blue', 'green', 'gray']
+MARKER = ['*', '^', 'x', 'o']
 def cal_train_time(log_dicts, args):
     for i, log_dict in enumerate(log_dicts):
         print(f'{"-" * 5}Analyze train time of {args.json_logs[i]}{"-" * 5}')
@@ -37,6 +38,7 @@ def plot_curve(log_dicts, args):
     # sns.set_style(args.style)
     # if legend is None, use {filename}_{key} as legend
     legend = args.legend
+    legend = ['FRCNN','CRCNN','dIoU-FRCNN','gIoU-FRCNN']
     if legend is None:
         legend = []
         for json_log in args.json_logs:
@@ -48,6 +50,8 @@ def plot_curve(log_dicts, args):
     num_metrics = len(metrics)
     for i, log_dict in enumerate(log_dicts):
         epochs = list(log_dict.keys())
+        epochs = epochs[:12]
+        print(epochs)
         for j, metric in enumerate(metrics):
             print(f'plot curve of {args.json_logs[i]}, metric is {metric}')
             if metric not in log_dict[epochs[0]]:
@@ -60,13 +64,15 @@ def plot_curve(log_dicts, args):
                 for epoch in epochs:
                     ys += log_dict[epoch][metric]
                 ax = plt.gca()
-                ax2 = ax.twinx()
-                ax2.set_xticks(xs)
-                ax2.tick_params(axis='y', labelcolor='tab:blue')
-                ax2.set_ylabel('eval mAP',rotation='horizontal')
-                ax2.yaxis.set_label_coords(1.05, -0.07)
-                ax2.set_ylim([0,1])
-                plt.plot(xs, ys, label=legend[i * num_metrics + j], linewidth=1, marker='*')
+                
+                plt.xlabel('epoch')
+                # ax2 = ax.twinx()
+                # ax.set_xticks(xs)
+                ax.tick_params(axis='y', labelcolor='tab:blue')
+                ax.set_ylabel('eval mAP',rotation='horizontal')
+                ax.yaxis.set_label_coords(1.05, -0.07)
+                ax.set_ylim([0,1])
+                plt.plot(xs, ys, label=legend[i * num_metrics + j], linewidth=1, marker=MARKER[i], color=COLOR[i])
                 # --------------------------------------
             elif 'loss' in metric:
                 xs = np.arange(1, max(epochs) + 1)
@@ -80,8 +86,9 @@ def plot_curve(log_dicts, args):
                 ax.tick_params(axis='y', labelcolor='tab:orange')
                 ax.set_ylabel('training loss',rotation='horizontal')
                 ax.yaxis.set_label_coords(-0.05, -0.11)
-                ax.set_ylim([0,1.2])
-                plt.plot(xs, ys, label=legend[i * num_metrics + j], linewidth=1, marker='x', color='orange')
+                ax.set_ylim([0,1])
+                plt.rc('legend',fontsize=16)
+                plt.plot(xs, ys, label=legend[i * num_metrics + j], linewidth=1, marker=MARKER[i], color=COLOR[i])
                 # ---------------------------------------
             else:
                 xs = []
@@ -186,18 +193,31 @@ def load_json_logs(json_logs):
 
 
 def main():
+    import os 
+
     args = parse_args()
 
     json_logs = args.json_logs
+
+    json_dir = 'xmTool/logs'
+    jlogs = []
     for json_log in json_logs:
         assert json_log.endswith('.json')
+        json_log = os.path.join(json_dir, json_log)
+        jlogs.append(json_log)
 
-    log_dicts = load_json_logs(json_logs)
 
-    print(log_dicts[0][1])
+    log_dicts = load_json_logs(jlogs)
+
+    # print(log_dicts[0][1])
 
     eval(args.task)(log_dicts, args)
 
 
 if __name__ == '__main__':
     main()
+
+
+'''
+ python3 xmTool/loss_plot.py plot_curve frcnn.json crcnn.json diou.json giou.json --keys mAP --out mAPs.png
+'''
