@@ -1,6 +1,6 @@
 import argparse
 import os
-
+import pickle
 import mmcv
 import torch
 from mmcv import Config, DictAction
@@ -132,7 +132,8 @@ def main():
             broadcast_buffers=False)
         outputs = multi_gpu_test(model, data_loader, args.tmpdir,
                                  args.gpu_collect)
-
+    with open('test.pkl','wb') as f:
+        pickle.dump(outputs, f)
     rank, _ = get_dist_info()
     if rank == 0:
         if args.out:
