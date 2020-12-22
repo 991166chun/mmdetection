@@ -1,18 +1,17 @@
 _base_ = [
     '../_base_/models/cascade_rcnn_r50_fpn.py',
-    './my_voc.py',
+    './my_dummy.py',
     './my_runtime.py'
 ]
 model = dict(
     backbone=dict(
-        type='ResNeXt',
-        depth=101,
-        groups=64,
-        base_width=4,
+        type='ResNet',
+        depth=50,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
         norm_cfg=dict(type='BN', requires_grad=True),
+        norm_eval=True,
         style='pytorch'),
     roi_head=dict(
       bbox_head=[
