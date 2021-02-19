@@ -25,6 +25,7 @@ test_pipeline = [
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
             dict(type='Normalize', **img_norm_cfg),
             dict(type='Pad', size_divisor=32),
             dict(type='ImageToTensor', keys=['img']),
@@ -36,11 +37,11 @@ data = dict(
     workers_per_gpu=2,
     train=dict(
         type='RepeatDataset',
-        times=1,
+        times=3,
         dataset=dict(
             type=dataset_type,
             ann_file=[
-                data_root + 'VOC2007/ImageSets/Main/draw.txt',
+                data_root + 'VOC2007/ImageSets/Main/dummy.txt',
             ],
             img_prefix=[data_root + 'VOC2007/',],
             pipeline=train_pipeline)),

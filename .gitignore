@@ -103,8 +103,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-mmdet/version.py
-./data/
+data/
+data
 .vscode
 .idea
 .DS_Store
@@ -114,7 +114,10 @@ mmdet/version.py
 *.pkl.json
 *.log.json
 work_dirs/
-
+*.png
+*.jpg
+nohup.out
+xmTool/Grad-CAM.pytorch/*
 # Pytorch
 *.pth
 *.jpg

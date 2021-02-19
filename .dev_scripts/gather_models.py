@@ -10,13 +10,13 @@ import torch
 
 # build schedule look-up table to automatically find the final model
 SCHEDULES_LUT = {
-    '1x': 12,
-    '2x': 24,
-    '20e': 20,
-    '3x': 36,
-    '4x': 48,
-    '24e': 24,
-    '6x': 73
+    '_1x_': 12,
+    '_2x_': 24,
+    '_20e_': 20,
+    '_3x_': 36,
+    '_4x_': 48,
+    '_24e_': 24,
+    '_6x_': 73
 }
 RESULTS_LUT = ['bbox_mAP', 'segm_mAP']
 
@@ -46,17 +46,21 @@ def get_final_epoch(config):
 
 
 def get_final_results(log_json_path, epoch):
+    result_dict = dict()
     with open(log_json_path, 'r') as f:
         for line in f.readlines():
             log_line = json.loads(line)
             if 'mode' not in log_line.keys():
                 continue
 
+            if log_line['mode'] == 'train' and log_line['epoch'] == epoch:
+                result_dict['memory'] = log_line['memory']
+
             if log_line['mode'] == 'val' and log_line['epoch'] == epoch:
-                result_dict = {
+                result_dict.update({
                     key: log_line[key]
                     for key in RESULTS_LUT if key in log_line
-                }
+                })
                 return result_dict
 
 
@@ -77,6 +81,7 @@ def main():
     args = parse_args()
     models_root = args.root
     models_out = args.out
+    mmcv.mkdir_or_exist(models_out)
 
     # find all models in the root directory to be gathered
     raw_configs = list(mmcv.scandir('./configs', '.py', recursive=True))
@@ -126,9 +131,8 @@ def main():
         mmcv.mkdir_or_exist(model_publish_dir)
 
         model_name = osp.split(model['config'])[-1].split('.')[0]
-        for k, v in model['results'].items():
-            model_name += '_{}-{}_'.format(k, v)
-        model_name += model['model_time']
+
+        model_name += '_' + model['model_time']
         publish_model_path = osp.join(model_publish_dir, model_name)
         trained_model_path = osp.join(models_root, model['config'],
                                       'epoch_{}.pth'.format(model['epochs']))
@@ -140,12 +144,11 @@ def main():
         # copy log
         shutil.copy(
             osp.join(models_root, model['config'], model['log_json_path']),
-            osp.join(model_publish_dir, model['log_json_path']))
+            osp.join(model_publish_dir, f'{model_name}.log.json'))
         shutil.copy(
             osp.join(models_root, model['config'],
                      model['log_json_path'].rstrip('.json')),
-            osp.join(model_publish_dir,
-                     model['log_json_path'].rstrip('.json')))
+            osp.join(model_publish_dir, f'{model_name}.log'))
 
         # copy config to guarantee reproducibility
         config_path = model['config']
@@ -160,6 +163,7 @@ def main():
         publish_model_infos.append(model)
 
     models = dict(models=publish_model_infos)
+    print(f'Totally gathered {len(publish_model_infos)} models')
     mmcv.dump(models, osp.join(models_out, 'model_info.json'))
 
 

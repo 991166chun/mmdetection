@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from mmdet.core import eval_map, eval_recalls
 from .builder import DATASETS
 from .xml_style import XMLDataset
@@ -28,6 +30,28 @@ class VOCDataset(XMLDataset):
                  proposal_nums=(100, 300, 1000),
                  iou_thr=0.5,
                  scale_ranges=None):
+        """Evaluate in VOC protocol.
+
+        Args:
+            results (list[list | tuple]): Testing results of the dataset.
+            metric (str | list[str]): Metrics to be evaluated. Options are
+                'mAP', 'recall'.
+            logger (logging.Logger | str, optional): Logger used for printing
+                related information during evaluation. Default: None.
+            proposal_nums (Sequence[int]): Proposal number used for evaluating
+                recalls, such as recall@100, recall@1000.
+                Default: (100, 300, 1000).
+            iou_thr (float | list[float]): IoU threshold. It must be a float
+                when evaluating mAP, and can be a list when evaluating recall.
+                Default: 0.5.
+            scale_ranges (list[tuple], optional): Scale ranges for evaluating
+                mAP. If not specified, all bounding boxes would be included in
+                evaluation. Default: None.
+
+        Returns:
+            dict[str, float]: AP/recall metrics.
+        """
+
         if not isinstance(metric, str):
             assert len(metric) == 1
             metric = metric[0]
@@ -35,13 +59,13 @@ class VOCDataset(XMLDataset):
         if metric not in allowed_metrics:
             raise KeyError(f'metric {metric} is not supported')
         annotations = [self.get_ann_info(i) for i in range(len(self))]
-        eval_results = {}
+        eval_results = OrderedDict()
         if metric == 'mAP':
             assert isinstance(iou_thr, float)
             if self.year == 2007:
                 ds_name = 'voc07'
             else:
-                ds_name = self.dataset.CLASSES
+                ds_name = self.CLASSES
             mean_ap, _ = eval_map(
                 results,
                 annotations,
