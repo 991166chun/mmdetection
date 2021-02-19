@@ -4,16 +4,16 @@ import matplotlib.pyplot as plt
 from mmcv.image import  imwrite
 
 color = {   
-            'brownblight':[0.75, 0.25, 0],
-            'blister':[0.5, 0.5, 0],
+            'brownblight':[1.0, 0.6, 0],
+            'blister':[0.2, 0.2, 0.2],
             'algal':[0, 0, 0.5],
             'fungi_early':[0.5, 0, 0.5],
-            'miner':[0, 0.5, 0.58],
-            'thrips':[0.5, 0.5, 0.5],
+            'miner':[0, 0.8, 0.8],
+            'thrips':[0.8, 0.3, 0.3],
             'mosquito_early':[0.75, 0, 0],
             'mosquito_late':[0.25, 0, 0],
-            'moth':[0.25, 0.5, 0],
-            'tortrix':[0.75, 0.5, 0],
+            'moth':[0.2, 0.4, 0.9],
+            'tortrix':[0.9, 0.6, 0.2],
             'flushworm':[0.25, 0, 0.5],
             'roller':[0.75, 0, 0.5],
             'other':[0.25, 0.5, 0.5],
@@ -25,6 +25,22 @@ color = {
             'cls 4':[0.5, 0.75, 0],
             'cls 5':[0, 0.25, 0.5]
             }
+
+cls_id = {   
+            'brownblight':'brown',
+            'blister':'blister',
+            'algal':'algal',
+            'fungi_early':'fungi',
+            'miner':'miner',
+            'thrips':'thrips',
+            'mosquito_early':'mos_e',
+            'mosquito_late':'mos_l',
+            'moth':'tor_w',
+            'tortrix':'tor_r',
+            'flushworm':'flush',
+            'roller':'ori_w',
+            'other':'',
+}
 ignoer_list = ['other',]
 
 def imshow_det_bboxes(img,
@@ -75,8 +91,8 @@ def imshow_det_bboxes(img,
     # bbox_color = color_val(bbox_color)
     # text_color = color_val(text_color)
     
-    fs = int(img.shape[0]/100)
-    lw = int(img.shape[0]/300)
+    fs = int(img.shape[0]/60)
+    lw = int(img.shape[0]/200)
     fig = plt.figure(frameon=False)
     dpi = 200
     fig.set_size_inches(img.shape[1] / dpi, img.shape[0] / dpi)
@@ -99,8 +115,7 @@ def imshow_det_bboxes(img,
                           fill=False,
                           edgecolor=tuple(color[name]),
                           linewidth=lw, alpha=0.7))
-        label_text = class_names[
-            label] if class_names is not None else f'cls {label}'
+        label_text = cls_id[name]
         if len(bbox) > 4:
             label_text += f' {bbox[-1]:.02f}'
         ax.text(
@@ -110,7 +125,7 @@ def imshow_det_bboxes(img,
                 family='serif',
                 bbox=dict(
                     facecolor=tuple(color[name]),
-                    alpha=0.6, pad=0, edgecolor='none'),
+                    alpha=0.7, pad=0, edgecolor='none'),
                 color='white')
 
     if show:

@@ -53,8 +53,9 @@ def main():
     print(dataset.CLASSES)
     for item in dataset:
         print(item.keys())
-        gt_box = item['gt_bboxes'][0]
-        gt_label = item['gt_labels'][0]
+        gt_box = item['gt_bboxes']
+        gt_label = item['gt_labels']
+        print(gt_label.shape)
         gt_label = np.reshape(gt_label, ( gt_label.shape[0],1))
         # print(gt_box.shape)
         gt = np.concatenate((gt_label, gt_box), axis=1)
@@ -74,7 +75,7 @@ def main():
         #     wait_time=args.show_interval)
         progress_bar.update()
     all_gt = {'test': gts}
-    file = open('xmTool/gt_test.pkl', 'wb')
+    file = open('xmTool/gt_origin.pkl', 'wb')
     pickle.dump(all_gt, file)
     file.close()
 

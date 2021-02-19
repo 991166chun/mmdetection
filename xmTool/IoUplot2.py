@@ -36,6 +36,10 @@ def y_fmt(tick_val, pos):
     else:
         return tick_val
 
+def hide_ticks(tick_val, pos):
+    
+    return ''
+
 def filled_hist(ax, edges, values, bottoms=None, orientation='v',
                 **kwargs):
     """
@@ -214,7 +218,7 @@ def draw(ax, tag, stack_data):
     
     ax.set_xlim([0.1, 1])
 
-def one_hist(ax, boxfile):
+def one_hist(ax, boxfile, tag=['rpn', 'reg']):
 
     with open(boxfile, 'rb') as f:
         boxdict =pkl.load(f)
@@ -224,10 +228,8 @@ def one_hist(ax, boxfile):
     with open(gtfile, 'rb') as f1:
         gtdict =pkl.load(f1)
 
-    tag1 = ['rpn', 'reg']
-
-    pr = boxdict[tag1[0]]
-    pr2 = boxdict[tag1[1]]
+    pr = boxdict[tag[0]]
+    pr2 = boxdict[tag[1]]
     
     gt = gtdict['test']
     
@@ -247,41 +249,72 @@ def one_hist(ax, boxfile):
     
     stack_data = np.stack((count,count2))
     
-    draw(ax, tag1, stack_data)
+    draw(ax, tag, stack_data)
     plt.tight_layout()
 
 
 if __name__ == '__main__':
-    if sys.argv[1] == 'iou'
+    if sys.argv[1] == 'iou':
+
         boxfile1 = 'xmTool/frcnn.pkl'
         boxfile2 = 'xmTool/giou.pkl'
         boxfile3 = 'xmTool/diou.pkl'
 
         fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3, figsize=(14, 5), sharey=True)
         
-        ax1.set_ylabel('counts',fontsize=18)
-        ax1.yaxis.set_major_formatter(mticker.FuncFormatter(y_fmt))
+        # ax1.set_ylabel('counts',fontsize=18)
+        ax1.yaxis.set_major_formatter(mticker.FuncFormatter(hide_ticks))
         plt.ylim((0,45000))
 
-        ax1.set_title('L1 norm loss',fontsize=18)
+        # ax1.set_title('L1 norm loss',fontsize=18)
         one_hist(ax1, boxfile1)
+        ax1.xaxis.set_major_formatter(mticker.FuncFormatter(hide_ticks))
         plt.tight_layout()
 
-        ax2.set_title('g-IoU loss',fontsize=18)
+        # ax2.set_title('g-IoU loss',fontsize=18)
         one_hist(ax2, boxfile2)
-        ax2.set_xlabel('IoU',fontsize=18)
+        # ax2.set_xlabel('IoU',fontsize=18)
+        ax2.xaxis.set_major_formatter(mticker.FuncFormatter(hide_ticks))
         plt.tight_layout()
 
-        ax3.set_title('d-IoU loss',fontsize=18)
+        # ax3.set_title('d-IoU loss',fontsize=18)
         one_hist(ax3, boxfile3)
-        plt.legend(loc='lower right', ncol=2, bbox_to_anchor=(1, -0.19),fontsize=14)
+        ax3.xaxis.set_major_formatter(mticker.FuncFormatter(hide_ticks))
+        # plt.legend(loc='lower right', ncol=2, bbox_to_anchor=(1, -0.19),fontsize=14)
         plt.tight_layout()
         
-        plt.savefig('xmTool/3iou' , dpi=200)
+        plt.savefig('xmTool/3iou_nt' , dpi=200)
         plt.close()
 
-    if argv[1] == 'cas':
+    if sys.argv[1] == 'cas':
+
+        boxfile = 'xmTool/cascade.pkl'
+
+        fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3, figsize=(14, 5), sharey=True)
         
+        # ax1.set_ylabel('counts',fontsize=18)
+        ax1.yaxis.set_major_formatter(mticker.FuncFormatter(hide_ticks))
+        plt.ylim((0,45000))
+
+        # ax1.set_title('Cascade stage1',fontsize=18)
+        one_hist(ax1, boxfile, tag=['rpn', 'stage1'])
+        ax1.xaxis.set_major_formatter(mticker.FuncFormatter(hide_ticks))
+        plt.tight_layout()
+
+        # ax2.set_title('Cascade stage2',fontsize=18)
+        one_hist(ax2, boxfile, tag=['rpn', 'stage2'])
+        # ax2.set_xlabel('IoU',fontsize=18)
+        ax2.xaxis.set_major_formatter(mticker.FuncFormatter(hide_ticks))
+        plt.tight_layout()
+
+        # ax3.set_title('Cascade stage3',fontsize=18)
+        one_hist(ax3, boxfile, tag=['rpn', 'stage3'])
+        ax3.xaxis.set_major_formatter(mticker.FuncFormatter(hide_ticks))
+        # plt.legend(labels=['rpn', 'reg'], loc='lower right', ncol=2, bbox_to_anchor=(1, -0.19),fontsize=14)
+        plt.tight_layout()
+        
+        plt.savefig('xmTool/cas_iou_nt.png' , dpi=200)
+        plt.close()
     
     
 
