@@ -6,7 +6,7 @@ from ..builder import LOSSES
 from .utils import weighted_loss
 
 @weighted_loss
-def diou_loss(pred, target, eps=1e-6):
+def mdiou_loss(pred, target, eps=1e-6):
   """ D-IoU loss
 
   Computing the distance-IoU loss between a set of predicted bboxes and target bboxes.
@@ -60,7 +60,7 @@ def diou_loss(pred, target, eps=1e-6):
   
 
 @LOSSES.register_module()
-class DIoULoss(nn.Module):
+class mDIoULoss(nn.Module):
 
   def __init__(self, eps=1e-6, reduction='mean', loss_weight=1.0):
     super(DIoULoss, self).__init__()

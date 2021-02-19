@@ -225,7 +225,7 @@ def draw(tag, stack_data):
 
 if __name__ == '__main__':
 
-    boxfile = 'xmTool/frcnn.pkl'
+    boxfile = 'xmTool/cascade_prp.pkl'
 
     with open(boxfile, 'rb') as f:
         boxdict =pkl.load(f)
@@ -235,7 +235,7 @@ if __name__ == '__main__':
     with open(gtfile, 'rb') as f1:
         gtdict =pkl.load(f1)
 
-    tag1 = ['rpn', 'reg']
+    tag1 = ['rpn', 'stage3']
 
     pr = boxdict[tag1[0]]
     pr2 = boxdict[tag1[1]]

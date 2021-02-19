@@ -50,7 +50,7 @@ def plot_curve(log_dicts, args):
     num_metrics = len(metrics)
     for i, log_dict in enumerate(log_dicts):
         epochs = list(log_dict.keys())
-        epochs = epochs[:12]
+        # epochs = epochs[:12]
         print(epochs)
         for j, metric in enumerate(metrics):
             print(f'plot curve of {args.json_logs[i]}, metric is {metric}')
@@ -68,6 +68,8 @@ def plot_curve(log_dicts, args):
                 plt.xlabel('epoch')
                 # ax2 = ax.twinx()
                 # ax.set_xticks(xs)
+                
+                plt.xticks(np.arange(0, 21, step=4))
                 ax.tick_params(axis='y', labelcolor='tab:blue')
                 ax.set_ylabel('eval mAP',rotation='horizontal')
                 ax.yaxis.set_label_coords(1.05, -0.07)
@@ -83,6 +85,7 @@ def plot_curve(log_dicts, args):
                     ys.append(avg_loss)
                 ax = plt.gca()
                 plt.xlabel('epoch')
+                plt.xticks(np.arange(0, 21, step=4))
                 ax.tick_params(axis='y', labelcolor='tab:orange')
                 ax.set_ylabel('training loss',rotation='horizontal')
                 ax.yaxis.set_label_coords(-0.05, -0.11)
@@ -199,7 +202,7 @@ def main():
 
     json_logs = args.json_logs
 
-    json_dir = 'xmTool/logs'
+    json_dir = 'xmTool/newlog'
     jlogs = []
     for json_log in json_logs:
         assert json_log.endswith('.json')
@@ -219,5 +222,5 @@ if __name__ == '__main__':
 
 
 '''
- python3 xmTool/loss_plot.py plot_curve frcnn.json crcnn.json diou.json giou.json --keys mAP --out mAPs.png
+ python3 xmTool/loss_plot.py plot_curve frcnn.json crcnn.json diou.json giou.json --keys mAP --out xmTool/newlog/mAPs.png
 '''
