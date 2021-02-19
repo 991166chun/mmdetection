@@ -15,6 +15,10 @@ train_pipeline = [
 ]
 test_pipeline = [
     dict(type='LoadImageFromFile', color_type='unchanged'),
+    # dict(type='LoadAnnotations', with_bbox=True),
+    # dict(type='Pad', size_divisor=32),
+    # dict(type='DefaultFormatBundle'),
+    # dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels']),
     dict(
         type='MultiScaleFlipAug',
         img_scale=(1000, 600),
@@ -25,18 +29,18 @@ test_pipeline = [
             dict(type='Pad', size_divisor=32),
             dict(type='ImageToTensor', keys=['img']),
             dict(type='Collect', keys=['img']),
-        ])
+        ]),
 ]
 data = dict(
     samples_per_gpu=4,
     workers_per_gpu=2,
     train=dict(
         type='RepeatDataset',
-        times=3,
+        times=1,
         dataset=dict(
             type=dataset_type,
             ann_file=[
-                data_root + 'VOC2007/ImageSets/Main/dummy.txt',
+                data_root + 'VOC2007/ImageSets/Main/draw.txt',
             ],
             img_prefix=[data_root + 'VOC2007/',],
             pipeline=train_pipeline)),

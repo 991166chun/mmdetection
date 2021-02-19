@@ -6,7 +6,7 @@ import mmcv
 from mmcv import Config
 
 from mmdet.datasets.builder import build_dataset
-
+from mmdet.xm_utils.vis import imshow_det_bboxes
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Browse a dataset')
@@ -34,7 +34,7 @@ def parse_args():
 
 def retrieve_data_cfg(config_path, skip_type):
     cfg = Config.fromfile(config_path)
-    train_data_cfg = cfg.data.train
+    train_data_cfg = cfg.data.test
     train_data_cfg['pipeline'] = [
         x for x in train_data_cfg.pipeline if x['type'] not in skip_type
     ]
@@ -46,19 +46,19 @@ def main():
     args = parse_args()
     cfg = retrieve_data_cfg(args.config, args.skip_type)
 
-    dataset = build_dataset(cfg.data.train)
+    dataset = build_dataset(cfg.data.test)
 
     progress_bar = mmcv.ProgressBar(len(dataset))
     for item in dataset:
         filename = os.path.join(args.output_dir,
                                 Path(item['filename']).name
                                 ) if args.output_dir is not None else None
-        mmcv.imshow_det_bboxes(
+        imshow_det_bboxes(
             item['img'],
             item['gt_bboxes'],
-            item['gt_labels'] - 1,
+            item['gt_labels'],
             class_names=dataset.CLASSES,
-            show=not args.not_show,
+            show=False,
             out_file=filename,
             wait_time=args.show_interval)
         progress_bar.update()
