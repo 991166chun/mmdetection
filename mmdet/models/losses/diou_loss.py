@@ -63,7 +63,7 @@ def mdiou_loss(pred, target, eps=1e-6):
 class mDIoULoss(nn.Module):
 
   def __init__(self, eps=1e-6, reduction='mean', loss_weight=1.0):
-    super(DIoULoss, self).__init__()
+    super(mDIoULoss, self).__init__()
     self.eps = eps
     self.reduction = reduction
     self.loss_weight = loss_weight
